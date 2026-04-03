@@ -11,96 +11,229 @@
   --bg: #0e0e0e;
   --surface: #161616;
   --surface2: #1e1e1e;
+  --surface3: #242424;
   --border: #2a2a2a;
   --border2: #333;
   --text: #e8e8e8;
   --muted: #666;
   --muted2: #888;
   --green: #00c97a;
-  --green-bg: #00c97a18;
+  --green-bg: rgba(0,201,122,0.09);
   --amber: #f5a623;
-  --amber-bg: #f5a62318;
+  --amber-bg: rgba(245,166,35,0.09);
   --red: #ff4d4d;
-  --red-bg: #ff4d4d18;
+  --red-bg: rgba(255,77,77,0.09);
   --blue: #4d9fff;
-  --blue-bg: #4d9fff18;
+  --blue-bg: rgba(77,159,255,0.09);
+  --purple: #c97aff;
+  --purple-bg: rgba(201,122,255,0.09);
   --accent: #00c97a;
   --mono: 'IBM Plex Mono', monospace;
   --sans: 'IBM Plex Sans', system-ui, sans-serif;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; min-height: 100vh; }
 
-.app { max-width: 760px; margin: 0 auto; padding: 32px 20px 60px; }
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,201,122,0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(0,201,122,0); }
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes badge-pop {
+  0%   { transform: scale(0.7); opacity: 0; }
+  70%  { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes tick-draw {
+  from { stroke-dashoffset: 20; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
 
-.header { margin-bottom: 36px; }
+.app { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+.app > * { animation: fadeUp 0.45s ease both; }
+.app > *:nth-child(1) { animation-delay: 0s; }
+.app > *:nth-child(2) { animation-delay: 0.05s; }
+.app > *:nth-child(3) { animation-delay: 0.1s; }
+.app > *:nth-child(4) { animation-delay: 0.15s; }
+.app > *:nth-child(5) { animation-delay: 0.2s; }
+.app > *:nth-child(6) { animation-delay: 0.25s; }
+
+/* ── HEADER ── */
+.header { margin-bottom: 32px; }
 .header-top { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 8px; }
 .logo { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; }
 .title { font-size: 26px; font-weight: 900; line-height: 1.2; }
 .title span { color: var(--accent); }
 .subtitle { font-size: 13px; color: var(--muted2); margin-top: 6px; font-family: var(--mono); }
 
-.info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+/* ── DEADLINE BANNER ── */
+.deadline-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #1a1200 0%, #1e1600 100%);
+  border: 1px solid rgba(245,166,35,0.25);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;
+  gap: 12px;
+}
+.deadline-left { display: flex; align-items: center; gap: 10px; }
+.deadline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); animation: pulse-dot 2s infinite; flex-shrink: 0; }
+.deadline-text { font-family: var(--mono); font-size: 12px; color: var(--amber); }
+.deadline-note { font-size: 12px; color: var(--muted2); line-height: 1.4; }
+.deadline-timer { font-family: var(--mono); font-size: 18px; font-weight: 600; color: var(--amber); white-space: nowrap; }
+
+/* ── FIELDS ── */
+.info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 .info-row.four { grid-template-columns: repeat(4, 1fr); }
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field label { font-size: 11px; font-family: var(--mono); color: var(--muted2); text-transform: uppercase; letter-spacing: 0.08em; }
-.field input, .field select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: var(--sans); color: var(--text); }
-.field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+.field input, .field select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: var(--sans); color: var(--text); transition: border-color 0.2s, box-shadow 0.2s; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,201,122,0.08); }
 .field input::placeholder { color: var(--muted); }
 
-.phase-block { margin-bottom: 20px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-.phase-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
-.phase-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.phase-name { font-size: 11px; font-family: var(--mono); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; }
-.phase-count { font-size: 11px; font-family: var(--mono); color: var(--muted); margin-right: auto; }
+/* ── CONV DISPLAY ── */
+.conv-display { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; transition: border-color 0.3s; }
+.conv-label { font-size: 12px; font-family: var(--mono); color: var(--muted2); }
+.conv-value { font-size: 24px; font-weight: 700; font-family: var(--mono); transition: color 0.4s; }
+.conv-target { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+.conv-badge { padding: 5px 11px; border-radius: 6px; font-size: 11px; font-family: var(--mono); font-weight: 600; animation: badge-pop 0.35s ease; }
+.badge-on   { background: var(--green-bg); color: var(--green); }
+.badge-low  { background: var(--red-bg); color: var(--red); }
+.badge-high { background: var(--blue-bg); color: var(--blue); }
 
-.check-item { display: flex; align-items: flex-start; gap: 14px; padding: 13px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
-.check-item:last-child { border-bottom: none; }
-.check-item:hover { background: var(--surface2); }
-.check-item.done { background: var(--green-bg); }
-.check-box { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid var(--border2); flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-.check-item.done .check-box { background: var(--green); border-color: var(--green); }
-.check-tick { width: 5px; height: 9px; border: 2px solid #000; border-top: none; border-left: none; transform: rotate(45deg) translateY(-1px); display: none; }
-.check-item.done .check-tick { display: block; }
-.check-text { flex: 1; }
-.check-title { font-size: 14px; font-weight: 500; line-height: 1.4; }
-.check-sub { font-size: 12px; color: var(--muted2); margin-top: 3px; line-height: 1.4; }
-.check-item.done .check-title { color: var(--green); }
-
-.notes-wrap { margin-bottom: 20px; }
-.notes-wrap textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 14px; font-family: var(--sans); color: var(--text); resize: vertical; min-height: 100px; line-height: 1.6; }
-.notes-wrap textarea:focus { outline: none; border-color: var(--accent); }
-.notes-wrap textarea::placeholder { color: var(--muted); }
-
+/* ── PROGRESS ── */
 .progress-wrap { margin-bottom: 24px; }
 .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .progress-label { font-size: 12px; font-family: var(--mono); color: var(--muted2); }
-.progress-pct { font-size: 18px; font-weight: 700; font-family: var(--mono); color: var(--accent); }
+.progress-pct { font-size: 18px; font-weight: 700; font-family: var(--mono); color: var(--accent); transition: color 0.3s; }
 .progress-bar { height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
-.progress-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.3s; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #00ffaa); border-radius: 99px; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
 
-.actions { display: flex; gap: 10px; align-items: center; }
-.btn-save { padding: 13px 28px; font-size: 15px; font-family: var(--sans); font-weight: 700; background: var(--accent); color: #000; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.15s; }
-.btn-save:hover { opacity: 0.85; }
+/* ── PHASE BLOCKS ── */
+.phase-block { margin-bottom: 16px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color 0.3s; }
+.phase-block.all-done { border-color: rgba(0,201,122,0.3); }
+.phase-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.phase-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.phase-name { font-size: 11px; font-family: var(--mono); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; }
+.phase-count { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+.phase-spacer { flex: 1; }
+.phase-note-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 3px 10px; font-size: 11px; font-family: var(--mono); color: var(--muted2); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.phase-note-btn:hover { border-color: var(--border2); color: var(--text); }
+.phase-note-btn.has-note { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
+
+/* ── CHECK ITEMS ── */
+.check-item { display: flex; align-items: flex-start; gap: 14px; padding: 13px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+.check-item:last-of-type { border-bottom: none; }
+.check-item:hover { background: var(--surface2); }
+.check-item.done { background: var(--green-bg); }
+.check-box { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid var(--border2); flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(.4,0,.2,1); }
+.check-item:hover .check-box { border-color: var(--muted2); }
+.check-item.done .check-box { background: var(--green); border-color: var(--green); transform: scale(1.05); }
+.check-tick { display: none; }
+.check-item.done .check-tick { display: block; }
+.check-text { flex: 1; }
+.check-title { font-size: 14px; font-weight: 500; line-height: 1.4; transition: color 0.2s; }
+.check-sub { font-size: 12px; color: var(--muted2); margin-top: 3px; line-height: 1.4; }
+.check-item.done .check-title { color: var(--green); }
+
+/* ── PHASE COMMENT ── */
+.phase-comment-row { border-top: 1px solid var(--border); padding: 10px 16px; background: var(--surface); display: none; animation: fadeUp 0.2s ease; }
+.phase-comment-row.visible { display: block; }
+.phase-comment-row textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: var(--sans); color: var(--text); resize: vertical; min-height: 72px; line-height: 1.5; transition: border-color 0.2s; }
+.phase-comment-row textarea:focus { outline: none; border-color: var(--amber); }
+.phase-comment-row textarea::placeholder { color: var(--muted); }
+.phase-comment-label { font-size: 11px; font-family: var(--mono); color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+
+/* ── MAIN NOTES ── */
+.notes-wrap { margin-bottom: 20px; }
+.notes-wrap textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 14px; font-family: var(--sans); color: var(--text); resize: vertical; min-height: 100px; line-height: 1.6; transition: border-color 0.2s, box-shadow 0.2s; }
+.notes-wrap textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,201,122,0.08); }
+.notes-wrap textarea::placeholder { color: var(--muted); }
+.field.full { gap: 8px; }
+
+/* ── ACTIONS ── */
+.actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.btn-save { padding: 13px 28px; font-size: 15px; font-family: var(--sans); font-weight: 700; background: var(--accent); color: #000; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
+.btn-save:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.btn-save:active:not(:disabled) { transform: translateY(0); }
 .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-clear { padding: 13px 20px; font-size: 15px; font-family: var(--sans); font-weight: 500; background: transparent; color: var(--muted2); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+.btn-summary { padding: 13px 20px; font-size: 15px; font-family: var(--sans); font-weight: 500; background: transparent; color: var(--blue); border: 1px solid rgba(77,159,255,0.3); border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+.btn-summary:hover { background: var(--blue-bg); border-color: var(--blue); }
+.btn-clear { padding: 13px 20px; font-size: 15px; font-family: var(--sans); font-weight: 500; background: transparent; color: var(--muted2); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.15s; }
 .btn-clear:hover { border-color: var(--border2); color: var(--text); }
-.save-status { font-size: 13px; font-family: var(--mono); }
-.save-status.ok { color: var(--green); }
+.save-status { font-size: 13px; font-family: var(--mono); animation: slide-in-right 0.25s ease; }
+.save-status.ok  { color: var(--green); }
 .save-status.err { color: var(--red); }
 
-.conv-display { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.conv-label { font-size: 12px; font-family: var(--mono); color: var(--muted2); }
-.conv-value { font-size: 22px; font-weight: 700; font-family: var(--mono); }
-.conv-target { font-size: 11px; font-family: var(--mono); color: var(--muted); }
-.conv-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-family: var(--mono); font-weight: 600; }
-.badge-on { background: var(--green-bg); color: var(--green); }
-.badge-low { background: var(--red-bg); color: var(--red); }
-.badge-high { background: var(--blue-bg); color: var(--blue); }
+/* ── MODAL OVERLAY ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; width: 100%; max-width: 520px; max-height: 85vh; overflow-y: auto; animation: modal-in 0.3s ease both; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 1; }
+.modal-title { font-size: 16px; font-weight: 700; }
+.modal-subtitle { font-size: 12px; font-family: var(--mono); color: var(--muted2); margin-top: 2px; }
+.modal-close { background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--muted2); cursor: pointer; padding: 6px 10px; font-size: 16px; line-height: 1; transition: all 0.15s; }
+.modal-close:hover { border-color: var(--border2); color: var(--text); }
+.modal-body { padding: 20px 24px 24px; }
+
+/* ── SUMMARY CARDS ── */
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.summary-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.summary-card-label { font-size: 10px; font-family: var(--mono); color: var(--muted2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.summary-card-value { font-size: 22px; font-weight: 700; font-family: var(--mono); }
+.summary-card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.summary-card.green { border-color: rgba(0,201,122,0.2); background: var(--green-bg); }
+.summary-card.green .summary-card-value { color: var(--green); }
+.summary-card.red { border-color: rgba(255,77,77,0.2); background: var(--red-bg); }
+.summary-card.red .summary-card-value { color: var(--red); }
+.summary-card.blue { border-color: rgba(77,159,255,0.2); background: var(--blue-bg); }
+.summary-card.blue .summary-card-value { color: var(--blue); }
+
+.summary-section-title { font-size: 11px; font-family: var(--mono); color: var(--muted2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.missing-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.missing-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; }
+.missing-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+.missing-item .phase-tag { font-size: 10px; font-family: var(--mono); padding: 2px 7px; border-radius: 4px; flex-shrink: 0; }
+.all-clear { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--green-bg); border: 1px solid rgba(0,201,122,0.2); border-radius: 8px; font-size: 13px; color: var(--green); margin-bottom: 20px; }
+
+.phase-notes-section { margin-top: 4px; }
+.phase-note-display { padding: 10px 12px; background: var(--surface2); border: 1px solid rgba(245,166,35,0.2); border-radius: 8px; margin-bottom: 8px; }
+.phase-note-display-label { font-size: 10px; font-family: var(--mono); color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.phase-note-display-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+/* ── PHASE COMPLETION BARS ── */
+.phase-progress-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.phase-prog-item { display: flex; align-items: center; gap: 10px; }
+.phase-prog-name { font-size: 12px; font-family: var(--mono); width: 140px; flex-shrink: 0; }
+.phase-prog-bar { flex: 1; height: 5px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+.phase-prog-fill { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+.phase-prog-pct { font-size: 11px; font-family: var(--mono); color: var(--muted2); width: 32px; text-align: right; }
+
+/* scrollbar */
+.modal::-webkit-scrollbar { width: 5px; }
+.modal::-webkit-scrollbar-track { background: transparent; }
+.modal::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
 </style>
 </head>
 <body>
 <div class="app">
+
+  <!-- HEADER -->
   <div class="header">
     <div class="header-top">
       <div class="logo">TL // Chasing Ops</div>
@@ -110,6 +243,19 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <div class="subtitle">Shift 3:00 PM — 11:00 PM · Target 25–35% Conv</div>
   </div>
 
+  <!-- DEADLINE BANNER -->
+  <div class="deadline-banner">
+    <div class="deadline-left">
+      <div class="deadline-dot"></div>
+      <div>
+        <div class="deadline-text">⏱ EOD Deadline: 11:00 PM</div>
+        <div class="deadline-note">This log must be saved before end of shift. Incomplete submissions after 11 PM will be flagged.</div>
+      </div>
+    </div>
+    <div class="deadline-timer" id="deadline-timer">—</div>
+  </div>
+
+  <!-- BASIC INFO -->
   <div class="info-row">
     <div class="field">
       <label>TL Name</label>
@@ -140,15 +286,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     </div>
   </div>
 
-  <div class="conv-display">
+  <!-- CONV DISPLAY -->
+  <div class="conv-display" id="conv-display">
     <div>
-      <div class="conv-label">Conv% today</div>
+      <div class="conv-label">Conversion Rate — Today</div>
       <div class="conv-value" id="conv-val">—</div>
       <div class="conv-target">Target: 25% — 35%</div>
     </div>
     <div id="conv-badge"></div>
   </div>
 
+  <!-- PROGRESS -->
   <div class="progress-wrap">
     <div class="progress-info">
       <span class="progress-label">Checklist completion</span>
@@ -157,120 +305,313 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
 
+  <!-- CHECKLISTS -->
   <div id="checklists"></div>
 
+  <!-- COACHING NOTES -->
   <div class="notes-wrap">
-    <div class="field" style="gap:8px;">
+    <div class="field full">
       <label>Coaching notes & red flags</label>
       <textarea id="coaching-notes" placeholder="Log coaching notes, red flags, or warning levels here..."></textarea>
     </div>
   </div>
 
+  <!-- ACTIONS -->
   <div class="actions">
     <button class="btn-save" id="save-btn" onclick="saveLog()">Save Log →</button>
+    <button class="btn-summary" onclick="openSummary()">My Summary</button>
     <button class="btn-clear" onclick="clearAll()">Clear</button>
     <span class="save-status" id="save-status"></span>
+  </div>
+</div>
+
+<!-- SUMMARY MODAL -->
+<div class="modal-overlay" id="summary-modal" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-tl-name">TL Summary</div>
+        <div class="modal-subtitle" id="modal-date-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeSummary()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
 
 <script>
 const PHASES = [
   { id: 'morning', name: 'Morning Review', color: '#4d9fff', items: [
-    { id: 'att', title: 'Attendance check', sub: 'Log who is present and who is absent' },
-    { id: 'prev_dos', title: 'Yesterday DOs vs target', sub: 'Compare DOs against 25–35% target' },
-    { id: 'dead_audit', title: 'Dead leads audit', sub: 'Review leads closed as "Dead" yesterday' },
+    { id: 'att',      title: 'Attendance check',          sub: 'Log who is present and who is absent' },
+    { id: 'prev_dos', title: 'Yesterday DOs vs target',   sub: 'Compare DOs against 25–35% target' },
+    { id: 'dead_audit',title: 'Dead leads audit',         sub: 'Review leads closed as "Dead" yesterday' },
   ]},
   { id: 'exec', name: 'Execution Audit', color: '#f5a623', items: [
-    { id: 'dashboard', title: 'Dashboard scrub — red flags', sub: 'Open dashboard and check for red flags' },
-    { id: 'first_touch', title: 'Untouched leads >48h', sub: 'Any lead without first touch = Level 1 warning' },
-    { id: 'no_movement', title: 'No movement leads >3 days', sub: 'Status unchanged for 3+ days' },
-    { id: 'stuck', title: 'Stuck "Receipt Confirmed" >5 days', sub: 'Must move to RX Received or Escalated' },
-    { id: 'fax_latency', title: 'Fax latency check', sub: 'Mutuality confirmed but no fax sent same shift' },
+    { id: 'dashboard',  title: 'Dashboard scrub — red flags',        sub: 'Open dashboard and check for red flags' },
+    { id: 'first_touch',title: 'Untouched leads >48h',               sub: 'Any lead without first touch = Level 1 warning' },
+    { id: 'no_movement',title: 'No movement leads >3 days',          sub: 'Status unchanged for 3+ days' },
+    { id: 'stuck',      title: 'Stuck "Receipt Confirmed" >5 days',  sub: 'Must move to RX Received or Escalated' },
+    { id: 'fax_latency',title: 'Fax latency check',                  sub: 'Mutuality confirmed but no fax sent same shift' },
   ]},
   { id: 'qc', name: 'QC & Coaching', color: '#c97aff', items: [
-    { id: 'calls', title: 'Review 2–4 calls per chaser', sub: 'Focus on Tier 3 weak chasers' },
-    { id: 'dr_confirm', title: 'Dr-patient relationship confirmed', sub: 'Verified on calls' },
-    { id: 'fax_num', title: 'Fax number recorded correctly', sub: 'Each chaser logged correct fax number' },
-    { id: 'followup', title: '48h follow-up grace check', sub: 'Every fax sent — follow-up within 48h?' },
+    { id: 'calls',      title: 'Review 2–4 calls per chaser',        sub: 'Focus on Tier 3 weak chasers' },
+    { id: 'dr_confirm', title: 'Dr-patient relationship confirmed',   sub: 'Verified on calls' },
+    { id: 'fax_num',    title: 'Fax number recorded correctly',      sub: 'Each chaser logged correct fax number' },
+    { id: 'followup',   title: '48h follow-up grace check',          sub: 'Every fax sent — follow-up within 48h?' },
   ]},
   { id: 'eod', name: 'EOD Closing', color: '#00c97a', items: [
-    { id: 'eod_summary', title: 'EOD summary compiled', sub: 'Total Touches + Faxes + RXs received' },
-    { id: 'coaching_doc', title: 'Coaching notes documented', sub: 'Documented for weak performers' },
-    { id: 'tomorrow', title: "Tomorrow's priority list set", sub: 'Priority leads for next shift' },
+    { id: 'eod_summary',  title: 'EOD summary compiled',          sub: 'Total Touches + Faxes + RXs received' },
+    { id: 'coaching_doc', title: 'Coaching notes documented',     sub: 'Documented for weak performers' },
+    { id: 'tomorrow',     title: "Tomorrow's priority list set",  sub: 'Priority leads for next shift' },
   ]},
 ];
 
 let checks = {};
+let phaseNotes = {};
 
+/* ─── RENDER ─── */
 function renderChecklists() {
   const container = document.getElementById('checklists');
   container.innerHTML = '';
   PHASES.forEach(phase => {
     const done = phase.items.filter(i => checks[i.id]).length;
+    const allDone = done === phase.items.length;
+    const hasNote = phaseNotes[phase.id] && phaseNotes[phase.id].trim();
     const block = document.createElement('div');
-    block.className = 'phase-block';
+    block.className = 'phase-block' + (allDone ? ' all-done' : '');
+
     block.innerHTML = `
       <div class="phase-header">
         <div class="phase-dot" style="background:${phase.color}"></div>
         <span class="phase-name" style="color:${phase.color}">${phase.name}</span>
         <span class="phase-count">${done}/${phase.items.length}</span>
+        <div class="phase-spacer"></div>
+        <button class="phase-note-btn ${hasNote ? 'has-note' : ''}" onclick="togglePhaseNote('${phase.id}')">
+          ${hasNote ? '📝 Note Added' : '+ Add Note'}
+        </button>
       </div>
       ${phase.items.map(item => `
         <div class="check-item ${checks[item.id] ? 'done' : ''}" onclick="toggle('${item.id}')" id="item-${item.id}">
-          <div class="check-box"><div class="check-tick"></div></div>
+          <div class="check-box">
+            <svg class="check-tick" width="12" height="10" viewBox="0 0 12 10" fill="none">
+              <path d="M1 5L4.5 8.5L11 1" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                stroke-dasharray="20" style="stroke-dashoffset:${checks[item.id] ? '0' : '20'}; transition: stroke-dashoffset 0.25s ease"/>
+            </svg>
+          </div>
           <div class="check-text">
             <div class="check-title">${item.title}</div>
             <div class="check-sub">${item.sub}</div>
           </div>
         </div>
       `).join('')}
+      <div class="phase-comment-row ${phaseNotes[phase.id] !== undefined ? 'visible' : ''}" id="note-row-${phase.id}">
+        <div class="phase-comment-label">📝 Phase Note / Incident Log</div>
+        <textarea id="note-${phase.id}" placeholder="What happened in this phase? Flag any issues, missing steps, or agent incidents..."
+          oninput="savePhaseNote('${phase.id}')">${phaseNotes[phase.id] || ''}</textarea>
+      </div>
     `;
     container.appendChild(block);
   });
 }
 
+function togglePhaseNote(phaseId) {
+  const row = document.getElementById('note-row-' + phaseId);
+  if (phaseNotes[phaseId] === undefined) {
+    phaseNotes[phaseId] = '';
+    row.classList.add('visible');
+    setTimeout(() => document.getElementById('note-' + phaseId).focus(), 50);
+  } else {
+    if (!phaseNotes[phaseId].trim()) {
+      delete phaseNotes[phaseId];
+      row.classList.remove('visible');
+      renderChecklists();
+    } else {
+      row.classList.toggle('visible');
+    }
+  }
+  renderChecklists();
+}
+
+function savePhaseNote(phaseId) {
+  const ta = document.getElementById('note-' + phaseId);
+  if (ta) {
+    phaseNotes[phaseId] = ta.value;
+    const btn = document.querySelector(`[onclick="togglePhaseNote('${phaseId}')"]`);
+    if (btn) {
+      const hasNote = ta.value.trim().length > 0;
+      btn.className = 'phase-note-btn' + (hasNote ? ' has-note' : '');
+      btn.textContent = hasNote ? '📝 Note Added' : '+ Add Note';
+    }
+  }
+}
+
+/* ─── TOGGLE ─── */
 function toggle(id) {
   checks[id] = !checks[id];
-  const item = document.getElementById('item-' + id);
-  item.classList.toggle('done', checks[id]);
-  item.querySelector('.check-tick').style.display = checks[id] ? 'block' : 'none';
   updateProgress();
   renderChecklists();
 }
 
+/* ─── PROGRESS ─── */
 function updateProgress() {
   let done = 0, total = 0;
   PHASES.forEach(p => p.items.forEach(i => { total++; if (checks[i.id]) done++; }));
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   document.getElementById('pct-label').textContent = pct + '%';
   document.getElementById('progress-fill').style.width = pct + '%';
+  const pctEl = document.getElementById('pct-label');
+  if (pct === 100) pctEl.style.color = 'var(--green)';
+  else if (pct >= 60) pctEl.style.color = 'var(--amber)';
+  else pctEl.style.color = 'var(--accent)';
 }
 
+/* ─── CONV ─── */
 function updateConv() {
   const leads = parseInt(document.getElementById('total-leads').value) || 0;
-  const dos = parseInt(document.getElementById('dos-today').value) || 0;
-  const conv = leads > 0 ? Math.round((dos / leads) * 100) : null;
-  const valEl = document.getElementById('conv-val');
+  const dos   = parseInt(document.getElementById('dos-today').value) || 0;
+  const conv  = leads > 0 ? Math.round((dos / leads) * 100) : null;
+  const valEl   = document.getElementById('conv-val');
   const badgeEl = document.getElementById('conv-badge');
-  if (conv === null) { valEl.textContent = '—'; badgeEl.innerHTML = ''; return; }
+  const dispEl  = document.getElementById('conv-display');
+  if (conv === null) { valEl.textContent = '—'; badgeEl.innerHTML = ''; dispEl.style.borderColor = ''; return; }
   valEl.textContent = conv + '%';
   if (conv >= 25 && conv <= 35) {
     valEl.style.color = 'var(--green)';
     badgeEl.innerHTML = '<span class="conv-badge badge-on">On Target ✓</span>';
+    dispEl.style.borderColor = 'rgba(0,201,122,0.25)';
   } else if (conv < 25) {
     valEl.style.color = 'var(--red)';
-    badgeEl.innerHTML = '<span class="conv-badge badge-low">Below Target</span>';
+    badgeEl.innerHTML = '<span class="conv-badge badge-low">Below Target ↓</span>';
+    dispEl.style.borderColor = 'rgba(255,77,77,0.25)';
   } else {
     valEl.style.color = 'var(--blue)';
-    badgeEl.innerHTML = '<span class="conv-badge badge-high">Above Target</span>';
+    badgeEl.innerHTML = '<span class="conv-badge badge-high">Above Target ↑</span>';
+    dispEl.style.borderColor = 'rgba(77,159,255,0.25)';
   }
 }
 
-async function saveLog() {
-  const name = document.getElementById('tl-name').value.trim();
-  const date = document.getElementById('shift-date').value;
+/* ─── DEADLINE TIMER ─── */
+function updateTimer() {
+  const now = new Date();
+  const deadline = new Date();
+  deadline.setHours(23, 0, 0, 0);
+  const diff = deadline - now;
+  const el = document.getElementById('deadline-timer');
+  if (diff <= 0) { el.textContent = 'OVERDUE'; el.style.color = 'var(--red)'; return; }
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if (diff < 3600000) el.style.color = 'var(--red)';
+  else if (diff < 7200000) el.style.color = 'var(--amber)';
+  else el.style.color = 'var(--amber)';
+}
+
+/* ─── SUMMARY MODAL ─── */
+function openSummary() {
+  const name = document.getElementById('tl-name').value.trim() || 'Unknown TL';
+  const date = document.getElementById('shift-date').value || 'No date set';
   const leads = parseInt(document.getElementById('total-leads').value) || 0;
-  const dos = parseInt(document.getElementById('dos-today').value) || 0;
+  const dos   = parseInt(document.getElementById('dos-today').value) || 0;
+  const faxes = parseInt(document.getElementById('faxes-sent').value) || 0;
+  const rxs   = parseInt(document.getElementById('rxs-received').value) || 0;
+  const conv  = leads > 0 ? Math.round((dos / leads) * 100) : null;
+
+  let totalDone = 0, totalItems = 0;
+  const missing = [];
+  PHASES.forEach(p => p.items.forEach(i => {
+    totalItems++;
+    if (checks[i.id]) totalDone++;
+    else missing.push({ title: i.title, phase: p.name, color: p.color });
+  }));
+  const pct = totalItems > 0 ? Math.round((totalDone / totalItems) * 100) : 0;
+
+  const convColor = conv === null ? 'var(--muted2)' : conv >= 25 && conv <= 35 ? 'var(--green)' : conv < 25 ? 'var(--red)' : 'var(--blue)';
+  const pctColor  = pct === 100 ? 'var(--green)' : pct >= 60 ? 'var(--amber)' : 'var(--red)';
+
+  document.getElementById('modal-tl-name').textContent = name + ' — Daily Summary';
+  document.getElementById('modal-date-sub').textContent = date + ' · Shift 3:00 PM – 11:00 PM';
+
+  const phaseProgressHTML = PHASES.map(p => {
+    const done = p.items.filter(i => checks[i.id]).length;
+    const pp = Math.round((done / p.items.length) * 100);
+    return `<div class="phase-prog-item">
+      <span class="phase-prog-name" style="color:${p.color}">${p.name}</span>
+      <div class="phase-prog-bar"><div class="phase-prog-fill" style="width:${pp}%; background:${p.color}"></div></div>
+      <span class="phase-prog-pct">${pp}%</span>
+    </div>`;
+  }).join('');
+
+  const notesHTML = Object.entries(phaseNotes).filter(([,v]) => v && v.trim()).map(([id, note]) => {
+    const phase = PHASES.find(p => p.id === id);
+    if (!phase) return '';
+    return `<div class="phase-note-display">
+      <div class="phase-note-display-label" style="color:${phase.color}">${phase.name}</div>
+      <div class="phase-note-display-text">${note.trim()}</div>
+    </div>`;
+  }).join('');
+
+  const coachingNotes = document.getElementById('coaching-notes').value.trim();
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="summary-grid">
+      <div class="summary-card ${pct === 100 ? 'green' : pct < 60 ? 'red' : ''}">
+        <div class="summary-card-label">Checklist</div>
+        <div class="summary-card-value" style="color:${pctColor}">${pct}%</div>
+        <div class="summary-card-sub">${totalDone}/${totalItems} done</div>
+      </div>
+      <div class="summary-card ${conv !== null && conv >= 25 && conv <= 35 ? 'green' : conv !== null && conv < 25 ? 'red' : conv !== null ? 'blue' : ''}">
+        <div class="summary-card-label">Conv%</div>
+        <div class="summary-card-value" style="color:${convColor}">${conv !== null ? conv + '%' : '—'}</div>
+        <div class="summary-card-sub">Target: 25–35%</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-card-label">DOs Today</div>
+        <div class="summary-card-value">${dos}</div>
+        <div class="summary-card-sub">${leads} leads · ${faxes} faxes · ${rxs} RXs</div>
+      </div>
+    </div>
+
+    <div class="summary-section-title">Phase Breakdown</div>
+    <div class="phase-progress-list" style="margin-bottom:20px">${phaseProgressHTML}</div>
+
+    <div class="summary-section-title">Incomplete Checklist Items</div>
+    ${missing.length === 0
+      ? `<div class="all-clear">✓ All checklist items completed — great shift!</div>`
+      : `<div class="missing-list">${missing.map(m => `
+          <div class="missing-item">
+            <div class="dot"></div>
+            <span class="phase-tag" style="background:${m.color}22; color:${m.color}">${m.phase}</span>
+            <span>${m.title}</span>
+          </div>`).join('')}</div>`}
+
+    ${notesHTML || coachingNotes ? `<div class="summary-section-title">Notes & Incidents</div>
+    <div class="phase-notes-section">${notesHTML}
+      ${coachingNotes ? `<div class="phase-note-display">
+        <div class="phase-note-display-label">General Coaching Notes</div>
+        <div class="phase-note-display-text">${coachingNotes}</div>
+      </div>` : ''}
+    </div>` : ''}
+  `;
+
+  document.getElementById('summary-modal').classList.add('open');
+}
+
+function closeSummary() {
+  document.getElementById('summary-modal').classList.remove('open');
+}
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('summary-modal')) closeSummary();
+}
+
+/* ─── SAVE ─── */
+async function saveLog() {
+  const name  = document.getElementById('tl-name').value.trim();
+  const date  = document.getElementById('shift-date').value;
+  const leads = parseInt(document.getElementById('total-leads').value) || 0;
+  const dos   = parseInt(document.getElementById('dos-today').value) || 0;
+  const faxes = parseInt(document.getElementById('faxes-sent').value) || 0;
+  const rxs   = parseInt(document.getElementById('rxs-received').value) || 0;
   const notes = document.getElementById('coaching-notes').value.trim();
   const scriptUrl = 'https://script.google.com/macros/s/AKfycbz2Y9mrqcB5sHD9jKix_AAOq4FyDyS1V7W2fe_VATB_voKvyzDKLHTZjlaL4fFcn6pA/exec';
 
@@ -279,19 +620,23 @@ async function saveLog() {
   let done = 0, total = 0;
   PHASES.forEach(p => p.items.forEach(i => { total++; if (checks[i.id]) done++; }));
   const completion = Math.round((done / total) * 100);
-  const conv = leads > 0 ? Math.round((dos / leads) * 100) : 0;
+  const conv  = leads > 0 ? Math.round((dos / leads) * 100) : 0;
   const flags = done < total ? 1 : 0;
-  const payload = { date, tlName: name, completion, conv, totalLeads: leads, dos, checksDone: done, totalChecks: total, checks, flags, notes };
+
+  const phaseNotesFlat = Object.entries(phaseNotes)
+    .filter(([,v]) => v && v.trim())
+    .map(([k,v]) => `[${k}] ${v.trim()}`)
+    .join(' | ');
+
+  const payload = { date, tlName: name, completion, conv, totalLeads: leads, dos, faxesSent: faxes, rxsReceived: rxs, checksDone: done, totalChecks: total, checks, flags, notes, phaseNotes: phaseNotesFlat };
 
   const btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  btn.textContent = 'Saving...';
+  btn.disabled = true; btn.textContent = 'Saving...';
   showStatus('', '');
 
   try {
     await fetch(scriptUrl, {
-      method: 'POST',
-      mode: 'no-cors',
+      method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
@@ -299,8 +644,7 @@ async function saveLog() {
   } catch (err) {
     showStatus('Error: ' + err.message, 'err');
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Save Log →';
+    btn.disabled = false; btn.textContent = 'Save Log →';
   }
 }
 
@@ -310,25 +654,26 @@ function showStatus(msg, type) {
   el.className = 'save-status ' + type;
 }
 
+/* ─── CLEAR ─── */
 function clearAll() {
-  document.getElementById('tl-name').value = '';
-  document.getElementById('total-leads').value = '';
-  document.getElementById('dos-today').value = '';
-  document.getElementById('faxes-sent').value = '';
-  document.getElementById('rxs-received').value = '';
-  document.getElementById('coaching-notes').value = '';
+  if (!confirm('Clear all fields and checklist?')) return;
+  ['tl-name','total-leads','dos-today','faxes-sent','rxs-received','coaching-notes'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
   document.getElementById('conv-val').textContent = '—';
   document.getElementById('conv-badge').innerHTML = '';
-  checks = {};
-  updateProgress();
-  renderChecklists();
+  document.getElementById('conv-display').style.borderColor = '';
+  checks = {}; phaseNotes = {};
+  updateProgress(); renderChecklists();
 }
 
-// Init
+/* ─── INIT ─── */
 document.getElementById('shift-date').value = new Date().toISOString().split('T')[0];
 document.getElementById('live-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 renderChecklists();
 updateProgress();
+updateTimer();
+setInterval(updateTimer, 1000);
 </script>
 </body>
 </html>
