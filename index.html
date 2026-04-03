@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TL Daily Log</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230e0e0e'/><rect x='6' y='6' width='20' height='3' rx='1.5' fill='%2300c97a'/><rect x='6' y='12' width='14' height='3' rx='1.5' fill='%2300c97a' opacity='.6'/><rect x='6' y='18' width='17' height='3' rx='1.5' fill='%2300c97a' opacity='.4'/><rect x='6' y='24' width='11' height='3' rx='1.5' fill='%2300c97a' opacity='.25'/></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;700;900&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -38,15 +39,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .title { font-size: 26px; font-weight: 900; line-height: 1.2; }
 .title span { color: var(--accent); }
 .subtitle { font-size: 13px; color: var(--muted2); margin-top: 6px; font-family: var(--mono); }
-
-.sheet-input-wrap { margin-bottom: 28px; }
-.sheet-label { font-size: 11px; font-family: var(--mono); color: var(--muted2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
-.sheet-url-row { display: flex; gap: 8px; }
-.sheet-url-row input { flex: 1; background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 14px; font-size: 13px; font-family: var(--mono); color: var(--text); }
-.sheet-url-row input:focus { outline: none; border-color: var(--accent); }
-.sheet-url-row input::placeholder { color: var(--muted); }
-.btn-sm { padding: 10px 16px; font-size: 13px; font-family: var(--sans); font-weight: 700; border: 1px solid var(--border2); border-radius: 8px; background: var(--surface2); color: var(--text); cursor: pointer; white-space: nowrap; }
-.btn-sm:hover { border-color: var(--accent); color: var(--accent); }
 
 .info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
 .info-row.four { grid-template-columns: repeat(4, 1fr); }
@@ -116,15 +108,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     </div>
     <div class="title">Daily <span>Log</span></div>
     <div class="subtitle">Shift 3:00 PM — 11:00 PM · Target 25–35% Conv</div>
-  </div>
-
-  <div class="sheet-input-wrap">
-    <div class="sheet-label">Apps Script URL (from your deployment)</div>
-    <div class="sheet-url-row">
-      <input type="text" id="script-url" placeholder="https://script.google.com/macros/s/AKfy.../exec" />
-      <button class="btn-sm" onclick="testConnection()">Test</button>
-    </div>
-    <div id="conn-status" style="font-size:12px; font-family:var(--mono); margin-top:6px; color:var(--muted);"></div>
   </div>
 
   <div class="info-row">
@@ -289,7 +272,7 @@ async function saveLog() {
   const leads = parseInt(document.getElementById('total-leads').value) || 0;
   const dos = parseInt(document.getElementById('dos-today').value) || 0;
   const notes = document.getElementById('coaching-notes').value.trim();
-  const scriptUrl = document.getElementById('script-url').value.trim();
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbz2Y9mrqcB5sHD9jKix_AAOq4FyDyS1V7W2fe_VATB_voKvyzDKLHTZjlaL4fFcn6pA/exec';
 
   if (!name || !date) { showStatus('Enter TL name and date first', 'err'); return; }
 
@@ -298,12 +281,7 @@ async function saveLog() {
   const completion = Math.round((done / total) * 100);
   const conv = leads > 0 ? Math.round((dos / leads) * 100) : 0;
   const flags = done < total ? 1 : 0;
-
   const payload = { date, tlName: name, completion, conv, totalLeads: leads, dos, checksDone: done, totalChecks: total, checks, flags, notes };
-
-  if (!scriptUrl) {
-    showStatus('Enter the Script URL first', 'err'); return;
-  }
 
   const btn = document.getElementById('save-btn');
   btn.disabled = true;
@@ -318,31 +296,11 @@ async function saveLog() {
       body: JSON.stringify(payload)
     });
     showStatus('Saved to sheet ✓', 'ok');
-    localStorage.setItem('tl_script_url', scriptUrl);
   } catch (err) {
     showStatus('Error: ' + err.message, 'err');
   } finally {
     btn.disabled = false;
     btn.textContent = 'Save Log →';
-  }
-}
-
-async function testConnection() {
-  const url = document.getElementById('script-url').value.trim();
-  const el = document.getElementById('conn-status');
-  if (!url) { el.textContent = 'Enter the URL first'; el.style.color = 'var(--red)'; return; }
-  el.textContent = 'Testing...'; el.style.color = 'var(--muted2)';
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.status === 'ok') {
-      el.textContent = '✓ Connected — sheet is live'; el.style.color = 'var(--green)';
-      localStorage.setItem('tl_script_url', url);
-    } else {
-      el.textContent = 'Error: ' + data.message; el.style.color = 'var(--red)';
-    }
-  } catch (e) {
-    el.textContent = 'Connection failed — check URL and deployment settings'; el.style.color = 'var(--red)';
   }
 }
 
@@ -369,8 +327,6 @@ function clearAll() {
 // Init
 document.getElementById('shift-date').value = new Date().toISOString().split('T')[0];
 document.getElementById('live-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-const saved = localStorage.getItem('tl_script_url');
-if (saved) document.getElementById('script-url').value = saved;
 renderChecklists();
 updateProgress();
 </script>
