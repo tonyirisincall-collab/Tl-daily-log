@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TL Daily Log</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0e0e0e;
+  --surface: #161616;
+  --surface2: #1e1e1e;
+  --border: #2a2a2a;
+  --border2: #333;
+  --text: #e8e8e8;
+  --muted: #666;
+  --muted2: #888;
+  --green: #00c97a;
+  --green-bg: #00c97a18;
+  --amber: #f5a623;
+  --amber-bg: #f5a62318;
+  --red: #ff4d4d;
+  --red-bg: #ff4d4d18;
+  --blue: #4d9fff;
+  --blue-bg: #4d9fff18;
+  --accent: #00c97a;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; min-height: 100vh; }
+
+.app { max-width: 760px; margin: 0 auto; padding: 32px 20px 60px; }
+
+.header { margin-bottom: 36px; }
+.header-top { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 8px; }
+.logo { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; }
+.title { font-size: 26px; font-weight: 900; line-height: 1.2; }
+.title span { color: var(--accent); }
+.subtitle { font-size: 13px; color: var(--muted2); margin-top: 6px; font-family: var(--mono); }
+
+.sheet-input-wrap { margin-bottom: 28px; }
+.sheet-label { font-size: 11px; font-family: var(--mono); color: var(--muted2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.sheet-url-row { display: flex; gap: 8px; }
+.sheet-url-row input { flex: 1; background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 14px; font-size: 13px; font-family: var(--mono); color: var(--text); }
+.sheet-url-row input:focus { outline: none; border-color: var(--accent); }
+.sheet-url-row input::placeholder { color: var(--muted); }
+.btn-sm { padding: 10px 16px; font-size: 13px; font-family: var(--sans); font-weight: 700; border: 1px solid var(--border2); border-radius: 8px; background: var(--surface2); color: var(--text); cursor: pointer; white-space: nowrap; }
+.btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+
+.info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.info-row.four { grid-template-columns: repeat(4, 1fr); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 11px; font-family: var(--mono); color: var(--muted2); text-transform: uppercase; letter-spacing: 0.08em; }
+.field input, .field select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: var(--sans); color: var(--text); }
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+.field input::placeholder { color: var(--muted); }
+
+.phase-block { margin-bottom: 20px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.phase-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.phase-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.phase-name { font-size: 11px; font-family: var(--mono); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; }
+.phase-count { font-size: 11px; font-family: var(--mono); color: var(--muted); margin-right: auto; }
+
+.check-item { display: flex; align-items: flex-start; gap: 14px; padding: 13px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+.check-item:last-child { border-bottom: none; }
+.check-item:hover { background: var(--surface2); }
+.check-item.done { background: var(--green-bg); }
+.check-box { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid var(--border2); flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.check-item.done .check-box { background: var(--green); border-color: var(--green); }
+.check-tick { width: 5px; height: 9px; border: 2px solid #000; border-top: none; border-left: none; transform: rotate(45deg) translateY(-1px); display: none; }
+.check-item.done .check-tick { display: block; }
+.check-text { flex: 1; }
+.check-title { font-size: 14px; font-weight: 500; line-height: 1.4; }
+.check-sub { font-size: 12px; color: var(--muted2); margin-top: 3px; line-height: 1.4; }
+.check-item.done .check-title { color: var(--green); }
+
+.notes-wrap { margin-bottom: 20px; }
+.notes-wrap textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 14px; font-family: var(--sans); color: var(--text); resize: vertical; min-height: 100px; line-height: 1.6; }
+.notes-wrap textarea:focus { outline: none; border-color: var(--accent); }
+.notes-wrap textarea::placeholder { color: var(--muted); }
+
+.progress-wrap { margin-bottom: 24px; }
+.progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.progress-label { font-size: 12px; font-family: var(--mono); color: var(--muted2); }
+.progress-pct { font-size: 18px; font-weight: 700; font-family: var(--mono); color: var(--accent); }
+.progress-bar { height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.3s; }
+
+.actions { display: flex; gap: 10px; align-items: center; }
+.btn-save { padding: 13px 28px; font-size: 15px; font-family: var(--sans); font-weight: 700; background: var(--accent); color: #000; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.15s; }
+.btn-save:hover { opacity: 0.85; }
+.btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-clear { padding: 13px 20px; font-size: 15px; font-family: var(--sans); font-weight: 500; background: transparent; color: var(--muted2); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+.btn-clear:hover { border-color: var(--border2); color: var(--text); }
+.save-status { font-size: 13px; font-family: var(--mono); }
+.save-status.ok { color: var(--green); }
+.save-status.err { color: var(--red); }
+
+.conv-display { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.conv-label { font-size: 12px; font-family: var(--mono); color: var(--muted2); }
+.conv-value { font-size: 22px; font-weight: 700; font-family: var(--mono); }
+.conv-target { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+.conv-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-family: var(--mono); font-weight: 600; }
+.badge-on { background: var(--green-bg); color: var(--green); }
+.badge-low { background: var(--red-bg); color: var(--red); }
+.badge-high { background: var(--blue-bg); color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">TL // Chasing Ops</div>
+      <div style="font-family:var(--mono); font-size:11px; color:var(--muted);" id="live-date"></div>
+    </div>
+    <div class="title">Daily <span>Log</span></div>
+    <div class="subtitle">Shift 3:00 PM — 11:00 PM · Target 25–35% Conv</div>
+  </div>
+
+  <div class="sheet-input-wrap">
+    <div class="sheet-label">Apps Script URL (from your deployment)</div>
+    <div class="sheet-url-row">
+      <input type="text" id="script-url" placeholder="https://script.google.com/macros/s/AKfy.../exec" />
+      <button class="btn-sm" onclick="testConnection()">Test</button>
+    </div>
+    <div id="conn-status" style="font-size:12px; font-family:var(--mono); margin-top:6px; color:var(--muted);"></div>
+  </div>
+
+  <div class="info-row">
+    <div class="field">
+      <label>TL Name</label>
+      <input type="text" id="tl-name" placeholder="Team Leader name" />
+    </div>
+    <div class="field">
+      <label>Date</label>
+      <input type="date" id="shift-date" />
+    </div>
+  </div>
+
+  <div class="info-row four">
+    <div class="field">
+      <label>Total Leads</label>
+      <input type="number" id="total-leads" placeholder="0" oninput="updateConv()" />
+    </div>
+    <div class="field">
+      <label>DOs Today</label>
+      <input type="number" id="dos-today" placeholder="0" oninput="updateConv()" />
+    </div>
+    <div class="field">
+      <label>Faxes Sent</label>
+      <input type="number" id="faxes-sent" placeholder="0" />
+    </div>
+    <div class="field">
+      <label>RXs Received</label>
+      <input type="number" id="rxs-received" placeholder="0" />
+    </div>
+  </div>
+
+  <div class="conv-display">
+    <div>
+      <div class="conv-label">Conv% today</div>
+      <div class="conv-value" id="conv-val">—</div>
+      <div class="conv-target">Target: 25% — 35%</div>
+    </div>
+    <div id="conv-badge"></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span class="progress-label">Checklist completion</span>
+      <span class="progress-pct" id="pct-label">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div id="checklists"></div>
+
+  <div class="notes-wrap">
+    <div class="field" style="gap:8px;">
+      <label>Coaching notes & red flags</label>
+      <textarea id="coaching-notes" placeholder="Log coaching notes, red flags, or warning levels here..."></textarea>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-save" id="save-btn" onclick="saveLog()">Save Log →</button>
+    <button class="btn-clear" onclick="clearAll()">Clear</button>
+    <span class="save-status" id="save-status"></span>
+  </div>
+</div>
+
+<script>
+const PHASES = [
+  { id: 'morning', name: 'Morning Review', color: '#4d9fff', items: [
+    { id: 'att', title: 'Attendance check', sub: 'Log who is present and who is absent' },
+    { id: 'prev_dos', title: 'Yesterday DOs vs target', sub: 'Compare DOs against 25–35% target' },
+    { id: 'dead_audit', title: 'Dead leads audit', sub: 'Review leads closed as "Dead" yesterday' },
+  ]},
+  { id: 'exec', name: 'Execution Audit', color: '#f5a623', items: [
+    { id: 'dashboard', title: 'Dashboard scrub — red flags', sub: 'Open dashboard and check for red flags' },
+    { id: 'first_touch', title: 'Untouched leads >48h', sub: 'Any lead without first touch = Level 1 warning' },
+    { id: 'no_movement', title: 'No movement leads >3 days', sub: 'Status unchanged for 3+ days' },
+    { id: 'stuck', title: 'Stuck "Receipt Confirmed" >5 days', sub: 'Must move to RX Received or Escalated' },
+    { id: 'fax_latency', title: 'Fax latency check', sub: 'Mutuality confirmed but no fax sent same shift' },
+  ]},
+  { id: 'qc', name: 'QC & Coaching', color: '#c97aff', items: [
+    { id: 'calls', title: 'Review 2–4 calls per chaser', sub: 'Focus on Tier 3 weak chasers' },
+    { id: 'dr_confirm', title: 'Dr-patient relationship confirmed', sub: 'Verified on calls' },
+    { id: 'fax_num', title: 'Fax number recorded correctly', sub: 'Each chaser logged correct fax number' },
+    { id: 'followup', title: '48h follow-up grace check', sub: 'Every fax sent — follow-up within 48h?' },
+  ]},
+  { id: 'eod', name: 'EOD Closing', color: '#00c97a', items: [
+    { id: 'eod_summary', title: 'EOD summary compiled', sub: 'Total Touches + Faxes + RXs received' },
+    { id: 'coaching_doc', title: 'Coaching notes documented', sub: 'Documented for weak performers' },
+    { id: 'tomorrow', title: "Tomorrow's priority list set", sub: 'Priority leads for next shift' },
+  ]},
+];
+
+let checks = {};
+
+function renderChecklists() {
+  const container = document.getElementById('checklists');
+  container.innerHTML = '';
+  PHASES.forEach(phase => {
+    const done = phase.items.filter(i => checks[i.id]).length;
+    const block = document.createElement('div');
+    block.className = 'phase-block';
+    block.innerHTML = `
+      <div class="phase-header">
+        <div class="phase-dot" style="background:${phase.color}"></div>
+        <span class="phase-name" style="color:${phase.color}">${phase.name}</span>
+        <span class="phase-count">${done}/${phase.items.length}</span>
+      </div>
+      ${phase.items.map(item => `
+        <div class="check-item ${checks[item.id] ? 'done' : ''}" onclick="toggle('${item.id}')" id="item-${item.id}">
+          <div class="check-box"><div class="check-tick"></div></div>
+          <div class="check-text">
+            <div class="check-title">${item.title}</div>
+            <div class="check-sub">${item.sub}</div>
+          </div>
+        </div>
+      `).join('')}
+    `;
+    container.appendChild(block);
+  });
+}
+
+function toggle(id) {
+  checks[id] = !checks[id];
+  const item = document.getElementById('item-' + id);
+  item.classList.toggle('done', checks[id]);
+  item.querySelector('.check-tick').style.display = checks[id] ? 'block' : 'none';
+  updateProgress();
+  renderChecklists();
+}
+
+function updateProgress() {
+  let done = 0, total = 0;
+  PHASES.forEach(p => p.items.forEach(i => { total++; if (checks[i.id]) done++; }));
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('pct-label').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function updateConv() {
+  const leads = parseInt(document.getElementById('total-leads').value) || 0;
+  const dos = parseInt(document.getElementById('dos-today').value) || 0;
+  const conv = leads > 0 ? Math.round((dos / leads) * 100) : null;
+  const valEl = document.getElementById('conv-val');
+  const badgeEl = document.getElementById('conv-badge');
+  if (conv === null) { valEl.textContent = '—'; badgeEl.innerHTML = ''; return; }
+  valEl.textContent = conv + '%';
+  if (conv >= 25 && conv <= 35) {
+    valEl.style.color = 'var(--green)';
+    badgeEl.innerHTML = '<span class="conv-badge badge-on">On Target ✓</span>';
+  } else if (conv < 25) {
+    valEl.style.color = 'var(--red)';
+    badgeEl.innerHTML = '<span class="conv-badge badge-low">Below Target</span>';
+  } else {
+    valEl.style.color = 'var(--blue)';
+    badgeEl.innerHTML = '<span class="conv-badge badge-high">Above Target</span>';
+  }
+}
+
+async function saveLog() {
+  const name = document.getElementById('tl-name').value.trim();
+  const date = document.getElementById('shift-date').value;
+  const leads = parseInt(document.getElementById('total-leads').value) || 0;
+  const dos = parseInt(document.getElementById('dos-today').value) || 0;
+  const notes = document.getElementById('coaching-notes').value.trim();
+  const scriptUrl = document.getElementById('script-url').value.trim();
+
+  if (!name || !date) { showStatus('Enter TL name and date first', 'err'); return; }
+
+  let done = 0, total = 0;
+  PHASES.forEach(p => p.items.forEach(i => { total++; if (checks[i.id]) done++; }));
+  const completion = Math.round((done / total) * 100);
+  const conv = leads > 0 ? Math.round((dos / leads) * 100) : 0;
+  const flags = done < total ? 1 : 0;
+
+  const payload = { date, tlName: name, completion, conv, totalLeads: leads, dos, checksDone: done, totalChecks: total, checks, flags, notes };
+
+  if (!scriptUrl) {
+    showStatus('Enter the Script URL first', 'err'); return;
+  }
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  showStatus('', '');
+
+  try {
+    await fetch(scriptUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    showStatus('Saved to sheet ✓', 'ok');
+    localStorage.setItem('tl_script_url', scriptUrl);
+  } catch (err) {
+    showStatus('Error: ' + err.message, 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Log →';
+  }
+}
+
+async function testConnection() {
+  const url = document.getElementById('script-url').value.trim();
+  const el = document.getElementById('conn-status');
+  if (!url) { el.textContent = 'Enter the URL first'; el.style.color = 'var(--red)'; return; }
+  el.textContent = 'Testing...'; el.style.color = 'var(--muted2)';
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.status === 'ok') {
+      el.textContent = '✓ Connected — sheet is live'; el.style.color = 'var(--green)';
+      localStorage.setItem('tl_script_url', url);
+    } else {
+      el.textContent = 'Error: ' + data.message; el.style.color = 'var(--red)';
+    }
+  } catch (e) {
+    el.textContent = 'Connection failed — check URL and deployment settings'; el.style.color = 'var(--red)';
+  }
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('save-status');
+  el.textContent = msg;
+  el.className = 'save-status ' + type;
+}
+
+function clearAll() {
+  document.getElementById('tl-name').value = '';
+  document.getElementById('total-leads').value = '';
+  document.getElementById('dos-today').value = '';
+  document.getElementById('faxes-sent').value = '';
+  document.getElementById('rxs-received').value = '';
+  document.getElementById('coaching-notes').value = '';
+  document.getElementById('conv-val').textContent = '—';
+  document.getElementById('conv-badge').innerHTML = '';
+  checks = {};
+  updateProgress();
+  renderChecklists();
+}
+
+// Init
+document.getElementById('shift-date').value = new Date().toISOString().split('T')[0];
+document.getElementById('live-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+const saved = localStorage.getItem('tl_script_url');
+if (saved) document.getElementById('script-url').value = saved;
+renderChecklists();
+updateProgress();
+</script>
+</body>
+</html>
